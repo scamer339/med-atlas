@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Anatomy AI</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #121212; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
+        #container { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        #main-image { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
+        /* Интерактивная точка */
+        .dot {
+            position: absolute; width: 24px; height: 24px;
+            background: rgba(0, 122, 255, 0.6);
+            border: 3px solid #fff; border-radius: 50%;
+            transform: translate(-50%, -50%); cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,122,255, 0.8);
+            animation: pulse 2s infinite; z-index: 10;
+        }
+        .dot:active { transform: translate(-50%, -50%) scale(0.9); background: #fff; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); } }
+
+        /* Всплывающее окно */
+        #popup {
+            position: fixed; bottom: 20px; left: 15px; right: 15px;
+            background: rgba(28, 28, 30, 0.95);
+            padding: 20px; border-radius: 16px;
+            display: none; z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 700; }
+        .latin { font-style: italic; color: #0a84ff; font-size: 16px; margin-top: 2px; }
+        .desc { font-size: 15px; line-height: 1.5; color: #aeaeb2; margin: 0; }
+        .close { background: none; border: none; color: #8e8e93; font-size: 24px; padding: 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="loader" style="position:absolute; color:#888;">Загрузка снимка...</div>
+    <img id="main-image" src="" alt="">
+</div>
+
+<div id="popup">
+    <div class="header">
+        <div>
+            <h2 id="p-ru">Название</h2>
+            <div id="p-lat" class="latin">Latin Name</div>
+        </div>
+        <button class="close" onclick="closePopup()">×</button>
+    </div>
+    <p id="p-desc" class="desc">Описание функции...</p>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const imgSrc = urlParams.get('img');
+    const rawData = urlParams.get('data');
+
+    const img = document.getElementById('main-image');
+    
+    if (imgSrc) {
+        img.src = decodeURIComponent(imgSrc);
+        img.onload = () => document.getElementById('loader').style.display = 'none';
+    }
+
+    // Если данные пришли, рисуем точки
+    if (rawData) {
+        try {
+            const points = JSON.parse(decodeURIComponent(rawData));
+            const container = document.getElementById('container');
+
+            img.onload = () => {
+                // Вычисляем реальные размеры картинки на экране
+                const w = img.clientWidth;
+                const h = img.clientHeight;
+                const offX = img.offsetLeft;
+                const offY = img.offsetTop;
+
+                points.forEach(p => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    // Gemini дает координаты 0-1000. Переводим в пиксели на экране.
+                    dot.style.left = (offX + (p.x / 1000) * w) + 'px';
+                    dot.style.top = (offY + (p.y / 1000) * h) + 'px';
+                    
+                    dot.onclick = (e) => {
+                        e.stopPropagation();
+                        showInfo(p);
+                    };
+                    container.appendChild(dot);
+                });
+            };
+        } catch (e) { console.error(e); }
+    }
+
+    function showInfo(data) {
+        document.getElementById('p-ru').innerText = data.ru || "Название";
+        document.getElementById('p-lat').innerText = data.lat || "";
+        document.getElementById('p-desc').innerText = data.desc || "Нет описания";
+        
+        const popup = document.getElementById('popup');
+        popup.style.display = 'block';
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+    
+    // Закрыть по клику на фон
+    document.getElementById('container').onclick = closePopup;
+</script>
+</body>
+</html>
