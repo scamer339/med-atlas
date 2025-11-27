@@ -2,123 +2,435 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Anatomy AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🧠 Анатомический Атлас</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { margin: 0; padding: 0; background: #121212; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
-        #container { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        #main-image { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        /* Интерактивная точка */
-        .dot {
-            position: absolute; width: 24px; height: 24px;
-            background: rgba(0, 122, 255, 0.6);
-            border: 3px solid #fff; border-radius: 50%;
-            transform: translate(-50%, -50%); cursor: pointer;
-            box-shadow: 0 0 15px rgba(0,122,255, 0.8);
-            animation: pulse 2s infinite; z-index: 10;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #1a1a2e);
+            color: var(--tg-theme-text-color, #ffffff);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
-        .dot:active { transform: translate(-50%, -50%) scale(0.9); background: #fff; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); } }
-
-        /* Всплывающее окно */
-        #popup {
-            position: fixed; bottom: 20px; left: 15px; right: 15px;
-            background: rgba(28, 28, 30, 0.95);
-            padding: 20px; border-radius: 16px;
-            display: none; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        
+        .header {
+            padding: 16px;
+            text-align: center;
+            background: var(--tg-theme-secondary-bg-color, #16213e);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        h2 { margin: 0; font-size: 20px; color: #fff; font-weight: 700; }
-        .latin { font-style: italic; color: #0a84ff; font-size: 16px; margin-top: 2px; }
-        .desc { font-size: 15px; line-height: 1.5; color: #aeaeb2; margin: 0; }
-        .close { background: none; border: none; color: #8e8e93; font-size: 24px; padding: 0; cursor: pointer; }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .atlas-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .atlas-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .point {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+        
+        .point:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .point.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transform: translate(-50%, -50%) scale(1.4);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        }
+        
+        .point-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .info-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color, #16213e);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .info-panel.visible {
+            transform: translateY(0);
+        }
+        
+        .info-panel .handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+        
+        .info-panel .ru-name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--tg-theme-text-color, #fff);
+        }
+        
+        .info-panel .lat-name {
+            font-size: 16px;
+            font-style: italic;
+            opacity: 0.7;
+            margin-bottom: 16px;
+            color: #a78bfa;
+        }
+        
+        .info-panel .description {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .info-panel .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--tg-theme-secondary-bg-color, #16213e);
+            border-radius: 16px;
+        }
+        
+        .legend h3 {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+            padding-left: 8px;
+            margin: 0 -8px;
+        }
+        
+        .legend-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .legend-item:last-child {
+            border-bottom: none;
+        }
+        
+        .legend-item .num {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .legend-item .text {
+            flex: 1;
+        }
+        
+        .legend-item .text .ru {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .legend-item .text .lat {
+            font-size: 12px;
+            opacity: 0.6;
+            font-style: italic;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 16px;
+        }
+        
+        .loading .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .error .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 50;
+        }
+        
+        .overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
-
-<div id="container">
-    <div id="loader" style="position:absolute; color:#888;">Загрузка снимка...</div>
-    <img id="main-image" src="" alt="">
-</div>
-
-<div id="popup">
-    <div class="header">
-        <div>
-            <h2 id="p-ru">Название</h2>
-            <div id="p-lat" class="latin">Latin Name</div>
+    <div id="app">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Загрузка атласа...</p>
         </div>
-        <button class="close" onclick="closePopup()">×</button>
     </div>
-    <p id="p-desc" class="desc">Описание функции...</p>
-</div>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const imgSrc = urlParams.get('img');
-    const rawData = urlParams.get('data');
-
-    const img = document.getElementById('main-image');
+    <div class="overlay" id="overlay"></div>
     
-    if (imgSrc) {
-        img.src = decodeURIComponent(imgSrc);
-        img.onload = () => document.getElementById('loader').style.display = 'none';
-    }
+    <div class="info-panel" id="infoPanel">
+        <div class="handle"></div>
+        <button class="close-btn" onclick="closePanel()">✕</button>
+        <div class="ru-name" id="infoRu"></div>
+        <div class="lat-name" id="infoLat"></div>
+        <div class="description" id="infoDesc"></div>
+    </div>
 
-    // Если данные пришли, рисуем точки
-    if (rawData) {
-        try {
-            const points = JSON.parse(decodeURIComponent(rawData));
-            const container = document.getElementById('container');
-
-            img.onload = () => {
-                // Вычисляем реальные размеры картинки на экране
-                const w = img.clientWidth;
-                const h = img.clientHeight;
-                const offX = img.offsetLeft;
-                const offY = img.offsetTop;
-
-                points.forEach(p => {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-                    // Gemini дает координаты 0-1000. Переводим в пиксели на экране.
-                    dot.style.left = (offX + (p.x / 1000) * w) + 'px';
-                    dot.style.top = (offY + (p.y / 1000) * h) + 'px';
-                    
-                    dot.onclick = (e) => {
-                        e.stopPropagation();
-                        showInfo(p);
-                    };
-                    container.appendChild(dot);
-                });
-            };
-        } catch (e) { console.error(e); }
-    }
-
-    function showInfo(data) {
-        document.getElementById('p-ru').innerText = data.ru || "Название";
-        document.getElementById('p-lat').innerText = data.lat || "";
-        document.getElementById('p-desc').innerText = data.desc || "Нет описания";
+    <script>
+        // Telegram Web App
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
+        }
         
-        const popup = document.getElementById('popup');
-        popup.style.display = 'block';
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-
-    function closePopup() {
-        document.getElementById('popup').style.display = 'none';
-    }
-    
-    // Закрыть по клику на фон
-    document.getElementById('container').onclick = closePopup;
-</script>
+        // Получаем параметры из URL
+        const params = new URLSearchParams(window.location.search);
+        const imgUrl = params.get('img');
+        const jsonData = params.get('data');
+        
+        let points = [];
+        let activePoint = null;
+        
+        function init() {
+            if (!imgUrl || !jsonData) {
+                showError('Нет данных для отображения');
+                return;
+            }
+            
+            try {
+                points = JSON.parse(decodeURIComponent(jsonData));
+                if (!Array.isArray(points) || points.length === 0) {
+                    showError('Структуры не найдены');
+                    return;
+                }
+                
+                renderAtlas();
+            } catch (e) {
+                console.error(e);
+                showError('Ошибка загрузки данных');
+            }
+        }
+        
+        function renderAtlas() {
+            const app = document.getElementById('app');
+            
+            app.innerHTML = `
+                <div class="header">
+                    <h1>🧠 Анатомический Атлас</h1>
+                    <p>Нажми на точку для подробностей</p>
+                </div>
+                <div class="atlas-container">
+                    <div class="image-wrapper" id="imageWrapper">
+                        <img src="${decodeURIComponent(imgUrl)}" class="atlas-image" id="atlasImage" onload="onImageLoad()" onerror="onImageError()">
+                    </div>
+                    <div class="legend" id="legend">
+                        <h3>📋 Структуры на изображении:</h3>
+                        <div id="legendItems"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function onImageLoad() {
+            const wrapper = document.getElementById('imageWrapper');
+            const img = document.getElementById('atlasImage');
+            const legendItems = document.getElementById('legendItems');
+            
+            // Добавляем точки
+            points.forEach((point, index) => {
+                // Точка на изображении
+                const dot = document.createElement('div');
+                dot.className = 'point';
+                dot.style.left = (point.x / 10) + '%';
+                dot.style.top = (point.y / 10) + '%';
+                dot.innerHTML = `<span class="point-number">${index + 1}</span>`;
+                dot.onclick = () => showInfo(index);
+                wrapper.appendChild(dot);
+                
+                // Элемент легенды
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <span class="num">${index + 1}</span>
+                    <div class="text">
+                        <div class="ru">${point.ru}</div>
+                        <div class="lat">${point.lat}</div>
+                    </div>
+                `;
+                item.onclick = () => showInfo(index);
+                legendItems.appendChild(item);
+            });
+        }
+        
+        function onImageError() {
+            showError('Не удалось загрузить изображение');
+        }
+        
+        function showInfo(index) {
+            const point = points[index];
+            if (!point) return;
+            
+            // Обновляем активную точку
+            document.querySelectorAll('.point').forEach((p, i) => {
+                p.classList.toggle('active', i === index);
+            });
+            
+            // Заполняем панель
+            document.getElementById('infoRu').textContent = point.ru;
+            document.getElementById('infoLat').textContent = point.lat;
+            document.getElementById('infoDesc').textContent = point.desc;
+            
+            // Показываем панель
+            document.getElementById('infoPanel').classList.add('visible');
+            document.getElementById('overlay').classList.add('visible');
+            
+            // Haptic feedback
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+        
+        function closePanel() {
+            document.getElementById('infoPanel').classList.remove('visible');
+            document.getElementById('overlay').classList.remove('visible');
+            document.querySelectorAll('.point').forEach(p => p.classList.remove('active'));
+        }
+        
+        document.getElementById('overlay').onclick = closePanel;
+        
+        function showError(message) {
+            document.getElementById('app').innerHTML = `
+                <div class="error">
+                    <div class="icon">😕</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+        
+        // Запуск
+        init();
+    </script>
 </body>
 </html>
