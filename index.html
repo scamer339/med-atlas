@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
     <title>🧠 Анатомический Атлас</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -21,21 +21,24 @@
         }
         
         .header {
-            padding: 16px;
+            padding: 12px 16px;
             text-align: center;
             background: var(--tg-theme-secondary-bg-color, #16213e);
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
         
         .header h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
         }
         
         .header p {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.7;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         
         .atlas-container {
@@ -43,15 +46,16 @@
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 12px;
         }
         
         .image-wrapper {
             position: relative;
             width: 100%;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: #000;
         }
         
         .atlas-image {
@@ -60,59 +64,63 @@
             display: block;
         }
         
+        /* Точки на изображении */
         .point {
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: 3px solid #fff;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             z-index: 10;
             animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .point:hover {
-            transform: translate(-50%, -50%) scale(1.3);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
         }
         
         .point.active {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            transform: translate(-50%, -50%) scale(1.4);
+            transform: translate(-50%, -50%) scale(1.3);
             animation: none;
+            box-shadow: 0 0 25px rgba(240, 147, 251, 0.8);
         }
         
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
-            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(102, 126, 234, 0); }
         }
         
         .point-number {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             font-size: 11px;
             font-weight: bold;
             color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
+        /* Информационная панель */
         .info-panel {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--tg-theme-secondary-bg-color, #16213e);
-            border-radius: 24px 24px 0 0;
-            padding: 24px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
             transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100;
-            box-shadow: 0 -8px 32px rgba(0,0,0,0.3);
-            max-height: 60vh;
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.4);
+            max-height: 55vh;
             overflow-y: auto;
         }
         
@@ -121,74 +129,105 @@
         }
         
         .info-panel .handle {
-            width: 40px;
+            width: 36px;
             height: 4px;
             background: rgba(255,255,255,0.3);
             border-radius: 2px;
-            margin: 0 auto 20px;
+            margin: 0 auto 16px;
+        }
+        
+        .info-panel .point-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .info-panel .title-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
         
         .info-panel .ru-name {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
             color: var(--tg-theme-text-color, #fff);
+            line-height: 1.2;
         }
         
         .info-panel .lat-name {
-            font-size: 16px;
+            font-size: 15px;
             font-style: italic;
-            opacity: 0.7;
-            margin-bottom: 16px;
+            opacity: 0.8;
+            margin-bottom: 12px;
             color: #a78bfa;
+            padding-left: 44px;
         }
         
         .info-panel .description {
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: 14px;
+            line-height: 1.5;
             opacity: 0.9;
+            padding-left: 44px;
+            padding-right: 40px;
         }
         
         .info-panel .close-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 16px;
+            right: 16px;
             width: 32px;
             height: 32px;
             background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 50%;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.2s;
         }
         
+        .info-panel .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Легенда */
         .legend {
-            margin-top: 20px;
-            padding: 16px;
+            margin-top: 16px;
+            padding: 12px;
             background: var(--tg-theme-secondary-bg-color, #16213e);
-            border-radius: 16px;
+            border-radius: 12px;
         }
         
         .legend h3 {
-            font-size: 14px;
+            font-size: 13px;
             opacity: 0.7;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .legend-item {
             display: flex;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 6px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             cursor: pointer;
             transition: background 0.2s;
             border-radius: 8px;
-            padding-left: 8px;
-            margin: 0 -8px;
+            margin: 2px -6px;
         }
         
         .legend-item:hover {
@@ -200,50 +239,63 @@
         }
         
         .legend-item .num {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            margin-right: 12px;
+            margin-right: 10px;
             flex-shrink: 0;
         }
         
         .legend-item .text {
             flex: 1;
+            min-width: 0;
         }
         
         .legend-item .text .ru {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .legend-item .text .lat {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.6;
             font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
+        /* Загрузка и ошибки */
         .loading {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            gap: 16px;
+            gap: 12px;
         }
         
         .loading .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(255,255,255,0.1);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
             border-top-color: #667eea;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .loading p {
+            font-size: 14px;
+            opacity: 0.7;
         }
         
         @keyframes spin {
@@ -252,7 +304,7 @@
         
         .error {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
         }
         
         .error .icon {
@@ -260,6 +312,12 @@
             margin-bottom: 16px;
         }
         
+        .error p {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        
+        /* Оверлей */
         .overlay {
             position: fixed;
             top: 0;
@@ -277,6 +335,35 @@
             opacity: 1;
             visibility: visible;
         }
+        
+        /* Навигация между точками */
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-left: 44px;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -292,9 +379,16 @@
     <div class="info-panel" id="infoPanel">
         <div class="handle"></div>
         <button class="close-btn" onclick="closePanel()">✕</button>
-        <div class="ru-name" id="infoRu"></div>
+        <div class="title-row">
+            <span class="point-badge" id="infoBadge">1</span>
+            <div class="ru-name" id="infoRu"></div>
+        </div>
         <div class="lat-name" id="infoLat"></div>
         <div class="description" id="infoDesc"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn" onclick="showPrev()">← Предыдущая</button>
+            <button class="nav-btn" id="nextBtn" onclick="showNext()">Следующая →</button>
+        </div>
     </div>
 
     <script>
@@ -308,14 +402,22 @@
         // Получаем параметры из URL
         const params = new URLSearchParams(window.location.search);
         const imgUrl = params.get('img');
+        const b64Data = params.get('b64');  // Поддержка base64
         const jsonData = params.get('data');
         
         let points = [];
-        let activePoint = null;
+        let activePointIndex = -1;
         
         function init() {
-            if (!imgUrl || !jsonData) {
+            // Проверяем наличие данных
+            if (!jsonData) {
                 showError('Нет данных для отображения');
+                return;
+            }
+            
+            // Нужна либо картинка по URL, либо base64
+            if (!imgUrl && !b64Data) {
+                showError('Нет изображения');
                 return;
             }
             
@@ -328,9 +430,27 @@
                 
                 renderAtlas();
             } catch (e) {
-                console.error(e);
+                console.error('Parse error:', e);
                 showError('Ошибка загрузки данных');
             }
+        }
+        
+        function getImageSrc() {
+            // Приоритет: URL > base64
+            if (imgUrl) {
+                return decodeURIComponent(imgUrl);
+            }
+            if (b64Data) {
+                // Определяем тип по первым байтам или используем jpeg по умолчанию
+                const decoded = decodeURIComponent(b64Data);
+                if (decoded.startsWith('/9j/')) {
+                    return `data:image/jpeg;base64,${decoded}`;
+                } else if (decoded.startsWith('iVBOR')) {
+                    return `data:image/png;base64,${decoded}`;
+                }
+                return `data:image/jpeg;base64,${decoded}`;
+            }
+            return '';
         }
         
         function renderAtlas() {
@@ -343,10 +463,12 @@
                 </div>
                 <div class="atlas-container">
                     <div class="image-wrapper" id="imageWrapper">
-                        <img src="${decodeURIComponent(imgUrl)}" class="atlas-image" id="atlasImage" onload="onImageLoad()" onerror="onImageError()">
+                        <img src="${getImageSrc()}" class="atlas-image" id="atlasImage" 
+                             onload="onImageLoad()" onerror="onImageError()" 
+                             alt="Анатомическая схема">
                     </div>
                     <div class="legend" id="legend">
-                        <h3>📋 Структуры на изображении:</h3>
+                        <h3>📋 Структуры на схеме (${points.length}):</h3>
                         <div id="legendItems"></div>
                     </div>
                 </div>
@@ -355,28 +477,37 @@
         
         function onImageLoad() {
             const wrapper = document.getElementById('imageWrapper');
-            const img = document.getElementById('atlasImage');
             const legendItems = document.getElementById('legendItems');
             
-            // Добавляем точки
+            // Добавляем точки на изображение
             points.forEach((point, index) => {
-                // Точка на изображении
+                // Точка
                 const dot = document.createElement('div');
                 dot.className = 'point';
-                dot.style.left = (point.x / 10) + '%';
-                dot.style.top = (point.y / 10) + '%';
+                dot.id = `point-${index}`;
+                
+                // Координаты: x и y в диапазоне 0-1000, конвертируем в проценты
+                const xPercent = (point.x / 10).toFixed(2);
+                const yPercent = (point.y / 10).toFixed(2);
+                
+                dot.style.left = xPercent + '%';
+                dot.style.top = yPercent + '%';
                 dot.innerHTML = `<span class="point-number">${index + 1}</span>`;
-                dot.onclick = () => showInfo(index);
+                dot.onclick = (e) => {
+                    e.stopPropagation();
+                    showInfo(index);
+                };
                 wrapper.appendChild(dot);
                 
                 // Элемент легенды
                 const item = document.createElement('div');
                 item.className = 'legend-item';
+                item.id = `legend-${index}`;
                 item.innerHTML = `
                     <span class="num">${index + 1}</span>
                     <div class="text">
-                        <div class="ru">${point.ru}</div>
-                        <div class="lat">${point.lat}</div>
+                        <div class="ru">${escapeHtml(point.ru || 'Структура')}</div>
+                        <div class="lat">${escapeHtml(point.lat || '')}</div>
                     </div>
                 `;
                 item.onclick = () => showInfo(index);
@@ -392,19 +523,37 @@
             const point = points[index];
             if (!point) return;
             
+            activePointIndex = index;
+            
             // Обновляем активную точку
             document.querySelectorAll('.point').forEach((p, i) => {
                 p.classList.toggle('active', i === index);
             });
             
+            // Обновляем легенду
+            document.querySelectorAll('.legend-item').forEach((item, i) => {
+                item.style.background = i === index ? 'rgba(102, 126, 234, 0.2)' : '';
+            });
+            
             // Заполняем панель
-            document.getElementById('infoRu').textContent = point.ru;
-            document.getElementById('infoLat').textContent = point.lat;
-            document.getElementById('infoDesc').textContent = point.desc;
+            document.getElementById('infoBadge').textContent = index + 1;
+            document.getElementById('infoRu').textContent = point.ru || 'Структура';
+            document.getElementById('infoLat').textContent = point.lat || '';
+            document.getElementById('infoDesc').textContent = point.desc || 'Описание отсутствует';
+            
+            // Обновляем кнопки навигации
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === points.length - 1;
             
             // Показываем панель
             document.getElementById('infoPanel').classList.add('visible');
             document.getElementById('overlay').classList.add('visible');
+            
+            // Прокручиваем к точке в легенде
+            const legendItem = document.getElementById(`legend-${index}`);
+            if (legendItem) {
+                legendItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             
             // Haptic feedback
             if (tg?.HapticFeedback) {
@@ -412,21 +561,74 @@
             }
         }
         
+        function showPrev() {
+            if (activePointIndex > 0) {
+                showInfo(activePointIndex - 1);
+            }
+        }
+        
+        function showNext() {
+            if (activePointIndex < points.length - 1) {
+                showInfo(activePointIndex + 1);
+            }
+        }
+        
         function closePanel() {
             document.getElementById('infoPanel').classList.remove('visible');
             document.getElementById('overlay').classList.remove('visible');
             document.querySelectorAll('.point').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.legend-item').forEach(item => item.style.background = '');
+            activePointIndex = -1;
+            
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         }
         
+        // Закрытие по клику на оверлей
         document.getElementById('overlay').onclick = closePanel;
+        
+        // Закрытие по свайпу вниз
+        let touchStartY = 0;
+        document.getElementById('infoPanel').addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.getElementById('infoPanel').addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const diff = touchY - touchStartY;
+            if (diff > 50) {
+                closePanel();
+            }
+        });
+        
+        // Навигация клавишами
+        document.addEventListener('keydown', (e) => {
+            if (activePointIndex === -1) return;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                showPrev();
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                showNext();
+            } else if (e.key === 'Escape') {
+                closePanel();
+            }
+        });
         
         function showError(message) {
             document.getElementById('app').innerHTML = `
                 <div class="error">
                     <div class="icon">😕</div>
-                    <p>${message}</p>
+                    <p>${escapeHtml(message)}</p>
                 </div>
             `;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         // Запуск
