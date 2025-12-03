@@ -3,313 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
-    <title>MedLib AI</title>
+    <title>🧠 Анатомический Атлас</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #0f0f1a);
+            background: var(--tg-theme-bg-color, #1a1a2e);
             color: var(--tg-theme-text-color, #ffffff);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-        
-        /* ═══════════════════════════════════════════════════════════════
-           MENU STYLES
-           ═══════════════════════════════════════════════════════════════ */
-        
-        .menu-view {
-            display: none;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .menu-view.active {
-            display: block;
-        }
-        
-        .menu-header {
-            padding: 20px 16px 16px;
-            text-align: center;
-            background: linear-gradient(135deg, 
-                rgba(102, 126, 234, 0.15) 0%, 
-                rgba(118, 75, 162, 0.15) 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .menu-logo {
-            font-size: 48px;
-            margin-bottom: 8px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        
-        .menu-header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .menu-header p {
-            font-size: 13px;
-            opacity: 0.6;
-            margin-top: 4px;
-        }
-        
-        .stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 16px;
-            margin: 12px 16px;
-            background: var(--tg-theme-secondary-bg-color, #1a1a2e);
-            border-radius: 16px;
-        }
-        
-        .stat {
-            text-align: center;
-            min-width: 60px;
-        }
-        
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            opacity: 0.5;
-            margin-top: 2px;
-        }
-        
-        .menu-container {
-            padding: 0 16px 100px;
-        }
-        
-        .section-title {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            opacity: 0.4;
-            margin: 20px 0 12px 4px;
-        }
-        
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        
-        .menu-card {
-            background: var(--tg-theme-secondary-bg-color, #1a1a2e);
-            border-radius: 16px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .menu-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--card-color, #667eea), transparent);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .menu-card:active {
-            transform: scale(0.97);
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-        
-        .menu-card:active::before {
-            opacity: 1;
-        }
-        
-        .card-icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .card-desc {
-            font-size: 11px;
-            opacity: 0.5;
-            line-height: 1.3;
-        }
-        
-        .menu-card.featured {
-            grid-column: span 2;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: linear-gradient(135deg, 
-                rgba(102, 126, 234, 0.2) 0%, 
-                rgba(118, 75, 162, 0.2) 100%);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-        
-        .menu-card.featured .card-icon {
-            font-size: 40px;
-            margin-bottom: 0;
-        }
-        
-        .menu-card.featured .card-content {
-            flex: 1;
-        }
-        
-        .badge-new {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 3px 6px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        
-        .quick-actions {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0 12px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .quick-actions::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .quick-btn {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 14px;
-            background: var(--tg-theme-secondary-bg-color, #1a1a2e);
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        
-        .quick-btn:active {
-            transform: scale(0.95);
-            border-color: rgba(102, 126, 234, 0.5);
-        }
-        
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 8px;
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
-            background: var(--tg-theme-secondary-bg-color, #1a1a2e);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            z-index: 100;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            opacity: 0.5;
-        }
-        
-        .nav-item.active {
-            opacity: 1;
-            background: rgba(102, 126, 234, 0.15);
-        }
-        
-        .nav-item:active {
-            opacity: 1;
-        }
-        
-        .nav-item .icon {
-            font-size: 22px;
-        }
-        
-        .nav-item .label {
-            font-size: 10px;
-            font-weight: 500;
-        }
-        
-        /* Card colors */
-        .menu-card[data-color="blue"] { --card-color: #3b82f6; }
-        .menu-card[data-color="purple"] { --card-color: #8b5cf6; }
-        .menu-card[data-color="pink"] { --card-color: #ec4899; }
-        .menu-card[data-color="green"] { --card-color: #10b981; }
-        .menu-card[data-color="orange"] { --card-color: #f59e0b; }
-        .menu-card[data-color="red"] { --card-color: #ef4444; }
-        .menu-card[data-color="cyan"] { --card-color: #06b6d4; }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .menu-card {
-            animation: fadeInUp 0.4s ease backwards;
-        }
-        
-        .menu-card:nth-child(1) { animation-delay: 0.05s; }
-        .menu-card:nth-child(2) { animation-delay: 0.1s; }
-        .menu-card:nth-child(3) { animation-delay: 0.15s; }
-        .menu-card:nth-child(4) { animation-delay: 0.2s; }
-        .menu-card:nth-child(5) { animation-delay: 0.25s; }
-        .menu-card:nth-child(6) { animation-delay: 0.3s; }
-        
-        /* ═══════════════════════════════════════════════════════════════
-           ATLAS STYLES
-           ═══════════════════════════════════════════════════════════════ */
-        
-        .atlas-view {
-            display: none;
-        }
-        
-        .atlas-view.active {
-            display: block;
         }
         
         .header {
@@ -356,6 +64,7 @@
             display: block;
         }
         
+        /* Точки на изображении */
         .point {
             position: absolute;
             width: 28px;
@@ -373,7 +82,7 @@
             justify-content: center;
         }
         
-        .point:hover, .point:active {
+        .point:hover {
             transform: translate(-50%, -50%) scale(1.2);
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
         }
@@ -397,6 +106,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
+        /* Информационная панель */
         .info-panel {
             position: fixed;
             bottom: 0;
@@ -488,11 +198,11 @@
             transition: background 0.2s;
         }
         
-        .info-panel .close-btn:hover,
-        .info-panel .close-btn:active {
+        .info-panel .close-btn:hover {
             background: rgba(255,255,255,0.2);
         }
         
+        /* Легенда */
         .legend {
             margin-top: 16px;
             padding: 12px;
@@ -520,8 +230,7 @@
             margin: 2px -6px;
         }
         
-        .legend-item:hover,
-        .legend-item:active {
+        .legend-item:hover {
             background: rgba(255,255,255,0.05);
         }
         
@@ -530,8 +239,8 @@
         }
         
         .legend-item .num {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
@@ -548,52 +257,67 @@
             min-width: 0;
         }
         
-        .legend-item .ru {
+        .legend-item .text .ru {
             font-size: 13px;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .legend-item .lat {
+        .legend-item .text .lat {
             font-size: 11px;
             opacity: 0.6;
             font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        .nav-buttons {
+        /* Загрузка и ошибки */
+        .loading {
             display: flex;
-            gap: 8px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .nav-btn {
-            flex: 1;
-            padding: 12px;
-            background: rgba(102, 126, 234, 0.2);
-            border: none;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            min-height: 100vh;
+            gap: 12px;
         }
         
-        .nav-btn:hover:not(:disabled),
-        .nav-btn:active:not(:disabled) {
-            background: rgba(102, 126, 234, 0.4);
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
         
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        .loading p {
+            font-size: 14px;
+            opacity: 0.7;
         }
         
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .error p {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        
+        /* Оверлей */
         .overlay {
             position: fixed;
             top: 0;
@@ -612,293 +336,98 @@
             visibility: visible;
         }
         
-        .error {
+        /* Навигация между точками */
+        .nav-buttons {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            text-align: center;
-            padding: 20px;
+            gap: 8px;
+            margin-top: 12px;
+            padding-left: 44px;
         }
         
-        .error .icon {
-            font-size: 64px;
-            margin-bottom: 16px;
+        .nav-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .error p {
-            font-size: 16px;
-            opacity: 0.7;
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <div id="app"></div>
-    
-    <!-- Atlas overlay and panel (always present) -->
+    <div id="app">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Загрузка атласа...</p>
+        </div>
+    </div>
+
     <div class="overlay" id="overlay"></div>
+    
     <div class="info-panel" id="infoPanel">
         <div class="handle"></div>
         <button class="close-btn" onclick="closePanel()">✕</button>
         <div class="title-row">
             <span class="point-badge" id="infoBadge">1</span>
-            <span class="ru-name" id="infoRu">Название</span>
+            <div class="ru-name" id="infoRu"></div>
         </div>
-        <div class="lat-name" id="infoLat">Латинское название</div>
-        <div class="description" id="infoDesc">Описание структуры...</div>
+        <div class="lat-name" id="infoLat"></div>
+        <div class="description" id="infoDesc"></div>
         <div class="nav-buttons">
-            <button class="nav-btn" id="prevBtn" onclick="showPrev()">← Назад</button>
-            <button class="nav-btn" id="nextBtn" onclick="showNext()">Далее →</button>
+            <button class="nav-btn" id="prevBtn" onclick="showPrev()">← Предыдущая</button>
+            <button class="nav-btn" id="nextBtn" onclick="showNext()">Следующая →</button>
         </div>
     </div>
-    
+
     <script>
+        // Telegram Web App
         const tg = window.Telegram?.WebApp;
-        
-        // Инициализация Telegram WebApp
         if (tg) {
-            tg.ready();
             tg.expand();
+            tg.ready();
         }
         
-        // Получаем параметры URL
+        // Получаем параметры из URL
         const params = new URLSearchParams(window.location.search);
         const imgUrl = params.get('img');
-        const b64Data = params.get('b64');
+        const b64Data = params.get('b64');  // Поддержка base64
         const jsonData = params.get('data');
-        const userData = params.get('user');
-        
-        // Определяем режим: меню или атлас
-        const isAtlasMode = jsonData && (imgUrl || b64Data);
         
         let points = [];
         let activePointIndex = -1;
         
-        // ═══════════════════════════════════════════════════════════════
-        // ИНИЦИАЛИЗАЦИЯ
-        // ═══════════════════════════════════════════════════════════════
-        
         function init() {
-            if (isAtlasMode) {
-                initAtlas();
-            } else {
-                initMenu();
-            }
-        }
-        
-        // ═══════════════════════════════════════════════════════════════
-        // MENU MODE
-        // ═══════════════════════════════════════════════════════════════
-        
-        function initMenu() {
-            // Парсим данные пользователя если есть
-            let userStats = { files: 156, xp: 450, streak: 5 };
-            if (userData) {
-                try {
-                    userStats = JSON.parse(decodeURIComponent(userData));
-                } catch(e) {}
+            // Проверяем наличие данных
+            if (!jsonData) {
+                showError('Нет данных для отображения');
+                return;
             }
             
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="menu-view active">
-                    <div class="menu-header">
-                        <div class="menu-logo">🏥</div>
-                        <h1>MedLib AI</h1>
-                        <p>Твой умный медицинский помощник</p>
-                    </div>
-                    
-                    <div class="stats-row">
-                        <div class="stat">
-                            <div class="stat-value" id="filesCount">${userStats.files || 0}</div>
-                            <div class="stat-label">Материалов</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="xpCount">${userStats.xp || 0}</div>
-                            <div class="stat-label">XP</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value" id="streakCount">${userStats.streak || 0}</div>
-                            <div class="stat-label">🔥 Стрик</div>
-                        </div>
-                    </div>
-                    
-                    <div class="menu-container">
-                        <!-- Quick Actions -->
-                        <div class="quick-actions">
-                            <div class="quick-btn" onclick="sendAction('search')">
-                                <span>🔍</span><span>Поиск</span>
-                            </div>
-                            <div class="quick-btn" onclick="sendAction('ai')">
-                                <span>🤖</span><span>AI чат</span>
-                            </div>
-                            <div class="quick-btn" onclick="sendAction('voice')">
-                                <span>🎤</span><span>Голос</span>
-                            </div>
-                            <div class="quick-btn" onclick="sendAction('video')">
-                                <span>🎬</span><span>Видео</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Learning -->
-                        <div class="section-title">📚 Обучение</div>
-                        <div class="menu-grid">
-                            <div class="menu-card featured" data-color="purple" onclick="sendAction('study')">
-                                <div class="card-icon">🎓</div>
-                                <div class="card-content">
-                                    <div class="card-title">Конспект по теме</div>
-                                    <div class="card-desc">AI создаст структурированный материал</div>
-                                </div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="blue" onclick="sendAction('quiz')">
-                                <span class="badge-new">NEW</span>
-                                <div class="card-icon">🎯</div>
-                                <div class="card-title">Тесты</div>
-                                <div class="card-desc">AI генерирует вопросы</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="green" onclick="sendAction('cards')">
-                                <span class="badge-new">NEW</span>
-                                <div class="card-icon">📚</div>
-                                <div class="card-title">Карточки</div>
-                                <div class="card-desc">Интервальное повторение</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="cyan" onclick="sendAction('interactive')">
-                                <div class="card-icon">🧠</div>
-                                <div class="card-title">Интерактив</div>
-                                <div class="card-desc">Учись играя</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="orange" onclick="sendAction('atlas')">
-                                <div class="card-icon">🖼</div>
-                                <div class="card-title">Атлас</div>
-                                <div class="card-desc">Анатомические схемы</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Create -->
-                        <div class="section-title">✨ Создать</div>
-                        <div class="menu-grid">
-                            <div class="menu-card" data-color="pink" onclick="sendAction('pptx')">
-                                <div class="card-icon">🎨</div>
-                                <div class="card-title">Презентация</div>
-                                <div class="card-desc">Canva-дизайн за минуту</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="purple" onclick="sendAction('multi')">
-                                <div class="card-icon">📑</div>
-                                <div class="card-title">Собрать</div>
-                                <div class="card-desc">Объединить файлы</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Library -->
-                        <div class="section-title">📖 Библиотека</div>
-                        <div class="menu-grid">
-                            <div class="menu-card" data-color="blue" onclick="sendAction('catalog')">
-                                <div class="card-icon">📚</div>
-                                <div class="card-title">Каталог</div>
-                                <div class="card-desc">Все материалы</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="orange" onclick="sendAction('favorites')">
-                                <div class="card-icon">⭐</div>
-                                <div class="card-title">Избранное</div>
-                                <div class="card-desc">Сохранённое</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="green" onclick="sendAction('schedule')">
-                                <div class="card-icon">🗓</div>
-                                <div class="card-title">Расписание</div>
-                                <div class="card-desc">Занятия</div>
-                            </div>
-                            
-                            <div class="menu-card" data-color="red" onclick="sendAction('news')">
-                                <div class="card-icon">📢</div>
-                                <div class="card-title">Новости</div>
-                                <div class="card-desc">Объявления</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Bottom Nav -->
-                    <div class="bottom-nav">
-                        <div class="nav-item active" onclick="sendAction('home')">
-                            <span class="icon">🏠</span>
-                            <span class="label">Главная</span>
-                        </div>
-                        <div class="nav-item" onclick="sendAction('search')">
-                            <span class="icon">🔍</span>
-                            <span class="label">Поиск</span>
-                        </div>
-                        <div class="nav-item" onclick="sendAction('ai')">
-                            <span class="icon">🤖</span>
-                            <span class="label">AI</span>
-                        </div>
-                        <div class="nav-item" onclick="sendAction('profile')">
-                            <span class="icon">🏆</span>
-                            <span class="label">Профиль</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Анимация чисел
-            setTimeout(() => animateNumbers(userStats), 300);
-        }
-        
-        function sendAction(action) {
-            // Haptic feedback
-            if (tg?.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('medium');
+            // Нужна либо картинка по URL, либо base64
+            if (!imgUrl && !b64Data) {
+                showError('Нет изображения');
+                return;
             }
             
-            // Отправляем в бот и закрываем WebApp
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify({ action: action }));
-                // WebApp автоматически закроется после sendData
-            } else {
-                console.log('Action:', action);
-                alert('Telegram WebApp не инициализирован. Действие: ' + action);
-            }
-        }
-        
-        function animateNumbers(stats) {
-            animateNumber('filesCount', stats.files || 156);
-            animateNumber('xpCount', stats.xp || 450);
-            animateNumber('streakCount', stats.streak || 5);
-        }
-        
-        function animateNumber(id, target) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            
-            let current = 0;
-            const step = Math.ceil(target / 20);
-            const interval = setInterval(() => {
-                current += step;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(interval);
-                }
-                el.textContent = current;
-            }, 30);
-        }
-        
-        // ═══════════════════════════════════════════════════════════════
-        // ATLAS MODE
-        // ═══════════════════════════════════════════════════════════════
-        
-        function initAtlas() {
             try {
                 points = JSON.parse(decodeURIComponent(jsonData));
                 if (!Array.isArray(points) || points.length === 0) {
                     showError('Структуры не найдены');
                     return;
                 }
+                
                 renderAtlas();
             } catch (e) {
                 console.error('Parse error:', e);
@@ -907,12 +436,18 @@
         }
         
         function getImageSrc() {
-            if (imgUrl) return decodeURIComponent(imgUrl);
+            // Приоритет: URL > base64
+            if (imgUrl) {
+                return decodeURIComponent(imgUrl);
+            }
             if (b64Data) {
+                // Определяем тип по первым байтам или используем jpeg по умолчанию
                 const decoded = decodeURIComponent(b64Data);
-                if (decoded.startsWith('/9j/')) return `data:image/jpeg;base64,${decoded}`;
-                if (decoded.startsWith('iVBOR')) return `data:image/png;base64,${decoded}`;
-                if (decoded.startsWith('R0lGOD')) return `data:image/gif;base64,${decoded}`;
+                if (decoded.startsWith('/9j/')) {
+                    return `data:image/jpeg;base64,${decoded}`;
+                } else if (decoded.startsWith('iVBOR')) {
+                    return `data:image/png;base64,${decoded}`;
+                }
                 return `data:image/jpeg;base64,${decoded}`;
             }
             return '';
@@ -922,21 +457,19 @@
             const app = document.getElementById('app');
             
             app.innerHTML = `
-                <div class="atlas-view active">
-                    <div class="header">
-                        <h1>🧠 Анатомический Атлас</h1>
-                        <p>Нажми на точку для подробностей</p>
+                <div class="header">
+                    <h1>🧠 Анатомический Атлас</h1>
+                    <p>Нажми на точку для подробностей</p>
+                </div>
+                <div class="atlas-container">
+                    <div class="image-wrapper" id="imageWrapper">
+                        <img src="${getImageSrc()}" class="atlas-image" id="atlasImage" 
+                             onload="onImageLoad()" onerror="onImageError()" 
+                             alt="Анатомическая схема">
                     </div>
-                    <div class="atlas-container">
-                        <div class="image-wrapper" id="imageWrapper">
-                            <img src="${getImageSrc()}" class="atlas-image" id="atlasImage" 
-                                 onload="onImageLoad()" onerror="onImageError()" 
-                                 alt="Анатомическая схема">
-                        </div>
-                        <div class="legend" id="legend">
-                            <h3>📋 Структуры на схеме (${points.length}):</h3>
-                            <div id="legendItems"></div>
-                        </div>
+                    <div class="legend" id="legend">
+                        <h3>📋 Структуры на схеме (${points.length}):</h3>
+                        <div id="legendItems"></div>
                     </div>
                 </div>
             `;
@@ -946,12 +479,14 @@
             const wrapper = document.getElementById('imageWrapper');
             const legendItems = document.getElementById('legendItems');
             
+            // Добавляем точки на изображение
             points.forEach((point, index) => {
-                // Точка на изображении
+                // Точка
                 const dot = document.createElement('div');
                 dot.className = 'point';
                 dot.id = `point-${index}`;
                 
+                // Координаты: x и y в диапазоне 0-1000, конвертируем в проценты
                 const xPercent = (point.x / 10).toFixed(2);
                 const yPercent = (point.y / 10).toFixed(2);
                 
@@ -990,41 +525,52 @@
             
             activePointIndex = index;
             
+            // Обновляем активную точку
             document.querySelectorAll('.point').forEach((p, i) => {
                 p.classList.toggle('active', i === index);
             });
             
+            // Обновляем легенду
             document.querySelectorAll('.legend-item').forEach((item, i) => {
                 item.style.background = i === index ? 'rgba(102, 126, 234, 0.2)' : '';
             });
             
+            // Заполняем панель
             document.getElementById('infoBadge').textContent = index + 1;
             document.getElementById('infoRu').textContent = point.ru || 'Структура';
             document.getElementById('infoLat').textContent = point.lat || '';
             document.getElementById('infoDesc').textContent = point.desc || 'Описание отсутствует';
             
+            // Обновляем кнопки навигации
             document.getElementById('prevBtn').disabled = index === 0;
             document.getElementById('nextBtn').disabled = index === points.length - 1;
             
+            // Показываем панель
             document.getElementById('infoPanel').classList.add('visible');
             document.getElementById('overlay').classList.add('visible');
             
+            // Прокручиваем к точке в легенде
             const legendItem = document.getElementById(`legend-${index}`);
             if (legendItem) {
                 legendItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             
+            // Haptic feedback
             if (tg?.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
         }
         
         function showPrev() {
-            if (activePointIndex > 0) showInfo(activePointIndex - 1);
+            if (activePointIndex > 0) {
+                showInfo(activePointIndex - 1);
+            }
         }
         
         function showNext() {
-            if (activePointIndex < points.length - 1) showInfo(activePointIndex + 1);
+            if (activePointIndex < points.length - 1) {
+                showInfo(activePointIndex + 1);
+            }
         }
         
         function closePanel() {
@@ -1039,9 +585,10 @@
             }
         }
         
-        // Event listeners для атласа
+        // Закрытие по клику на оверлей
         document.getElementById('overlay').onclick = closePanel;
         
+        // Закрытие по свайпу вниз
         let touchStartY = 0;
         document.getElementById('infoPanel').addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
@@ -1049,19 +596,24 @@
         
         document.getElementById('infoPanel').addEventListener('touchmove', (e) => {
             const touchY = e.touches[0].clientY;
-            if (touchY - touchStartY > 50) closePanel();
+            const diff = touchY - touchStartY;
+            if (diff > 50) {
+                closePanel();
+            }
         });
         
+        // Навигация клавишами
         document.addEventListener('keydown', (e) => {
             if (activePointIndex === -1) return;
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') showPrev();
-            else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') showNext();
-            else if (e.key === 'Escape') closePanel();
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                showPrev();
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                showNext();
+            } else if (e.key === 'Escape') {
+                closePanel();
+            }
         });
-        
-        // ═══════════════════════════════════════════════════════════════
-        // UTILS
-        // ═══════════════════════════════════════════════════════════════
         
         function showError(message) {
             document.getElementById('app').innerHTML = `
@@ -1079,7 +631,7 @@
             return div.innerHTML;
         }
         
-        // Запуск!
+        // Запуск
         init();
     </script>
 </body>
