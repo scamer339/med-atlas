@@ -856,11 +856,13 @@
                 tg.HapticFeedback.impactOccurred('medium');
             }
             
-            // Отправляем в бот
-            if (tg) {
+            // Отправляем в бот и закрываем WebApp
+            if (tg && tg.sendData) {
                 tg.sendData(JSON.stringify({ action: action }));
+                // WebApp автоматически закроется после sendData
             } else {
                 console.log('Action:', action);
+                alert('Telegram WebApp не инициализирован. Действие: ' + action);
             }
         }
         
